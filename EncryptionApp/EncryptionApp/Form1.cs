@@ -27,7 +27,9 @@ namespace EncryptionApp
 
         private void btn1_Click(object sender, EventArgs e)
         {
-
+            Form2 newForm = new Form2();
+            newForm.Show();
+            this.Hide();
         }
 
         private void btn2_Click(object sender, EventArgs e)

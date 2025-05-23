@@ -1,0 +1,67 @@
+Sava Mihajlović
+
+Niš
++381 60 166 3838
+
+Student četvrte godine osnovnih akademskih studija na Elektronskom fakultetu u Nišu, sa iskustvom u razvoju web aplikacija koristeći React i JavaScript. Takođe imam dodatno iskustvo u backend razvoju sa C# i .NET. Upoznat sam sa radom sa bazama podataka kao što su OracleDB, MongoDB, Redis, Neo4J i MySQL, kao i sa verzionisanjem koda pomoću Gita. Motivisan sam za kontinuirano učenje i razvoj, sa željom da unapredim svoje veštine i steknem nova znanja u oblasti programiranja i razvoja web aplikacija.
+
+LIČNI PODACI
+  Address: , Niš, 
+  Nationality: 
+  Driving License: 
+  Hobbies: 
+
+PROFILI NA DRUŠTVENIM MREŽAMA
+  * https://github.com/SavaMihajlovic: 
+  * : 
+
+JEZICI
+  ★★★★★ Srpski
+  ★★★★☆ Engleski
+
+RADNO ISKUSTVO
+  * 
+    BurgerHouse u , 
+      
+  Web aplikacija za real-time naručivanje i plaćanje hrane, sa funkcionalnostima za radnike koji odobravaju porudžbine.
+  Korišćene tehnologije: React, .NET C#, Redis, Docker, Git
+
+
+  * 
+    MovieTime u , 
+      
+  Web aplikacija za preporuku filmova i serija i njihovo ocenjivanje (recommendation sistem).
+  Korišćene tehnologije: React, .NET C#, Neo4J, Docker, Git
+
+
+
+  * 
+    Booking4U u , 
+      
+  Web aplikacija za pretragu i rezervaciju hotela prema različitim kriterijumima.
+  Korišćene tehnologije: React, .NET C#, MongoDB, Git
+
+
+
+OBRAZOVANJE
+  * 2017 – 2021
+    Gimnazija &quot;9. maj&quot;, Niš Diploma srednje škole
+
+    • Opšti smer | Prosečna ocena: 5.00
+
+  * 2021 – Sadašnjost
+    Elektronski fakultet, Niš 
+
+    • Osnovne akademske studije (modul Računarstvo i informatika)
+• Redovan student, IV godina
+
+VEŠTINE
+  * , , 
+
+    
+  Programski jezici: C, C++, C#, Python, JavaScript, TypeScript
+  Frontend: React, JavaScript, TypeScript, HTML, CSS
+  Backend: .NET (C#), Node.js
+  Baze podataka: MongoDB, Redis, Neo4J, OracleDB,  MySQL
+  Alati i tehnologije: Git, Docker, Chakra UI
+
