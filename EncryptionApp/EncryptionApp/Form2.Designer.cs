@@ -39,11 +39,16 @@
             this.rbDT = new System.Windows.Forms.RadioButton();
             this.btnCrypt = new System.Windows.Forms.Button();
             this.btnDecrypt = new System.Windows.Forms.Button();
-            this.btnBrowse = new System.Windows.Forms.Button();
+            this.btnBrowseInputFile = new System.Windows.Forms.Button();
             this.lbl5 = new System.Windows.Forms.Label();
             this.tbInputFile = new System.Windows.Forms.TextBox();
-            this.btnAutoGenDT = new System.Windows.Forms.Button();
+            this.btnAutoGen = new System.Windows.Forms.Button();
+            this.gBox2 = new System.Windows.Forms.GroupBox();
+            this.rbDecrypt = new System.Windows.Forms.RadioButton();
+            this.rbEncrypt = new System.Windows.Forms.RadioButton();
+            this.btnBrowseOutputFile = new System.Windows.Forms.Button();
             this.gBox1.SuspendLayout();
+            this.gBox2.SuspendLayout();
             this.SuspendLayout();
             // 
             // lbl1
@@ -158,16 +163,16 @@
             this.btnDecrypt.UseVisualStyleBackColor = true;
             this.btnDecrypt.Click += new System.EventHandler(this.btnDecrypt_Click);
             // 
-            // btnBrowse
+            // btnBrowseInputFile
             // 
-            this.btnBrowse.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnBrowse.Location = new System.Drawing.Point(657, 291);
-            this.btnBrowse.Name = "btnBrowse";
-            this.btnBrowse.Size = new System.Drawing.Size(145, 36);
-            this.btnBrowse.TabIndex = 11;
-            this.btnBrowse.Text = "Browse";
-            this.btnBrowse.UseVisualStyleBackColor = true;
-            this.btnBrowse.Click += new System.EventHandler(this.btnBrowse_Click);
+            this.btnBrowseInputFile.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnBrowseInputFile.Location = new System.Drawing.Point(657, 291);
+            this.btnBrowseInputFile.Name = "btnBrowseInputFile";
+            this.btnBrowseInputFile.Size = new System.Drawing.Size(145, 36);
+            this.btnBrowseInputFile.TabIndex = 11;
+            this.btnBrowseInputFile.Text = "Browse";
+            this.btnBrowseInputFile.UseVisualStyleBackColor = true;
+            this.btnBrowseInputFile.Click += new System.EventHandler(this.btnBrowseInputFile_Click);
             // 
             // lbl5
             // 
@@ -189,16 +194,60 @@
             this.tbInputFile.Size = new System.Drawing.Size(462, 26);
             this.tbInputFile.TabIndex = 13;
             // 
-            // btnAutoGenDT
+            // btnAutoGen
             // 
-            this.btnAutoGenDT.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnAutoGenDT.Location = new System.Drawing.Point(423, 207);
-            this.btnAutoGenDT.Name = "btnAutoGenDT";
-            this.btnAutoGenDT.Size = new System.Drawing.Size(195, 35);
-            this.btnAutoGenDT.TabIndex = 14;
-            this.btnAutoGenDT.Text = "Auto generate keys";
-            this.btnAutoGenDT.UseVisualStyleBackColor = true;
-            this.btnAutoGenDT.Click += new System.EventHandler(this.btnAutoGenDT_Click);
+            this.btnAutoGen.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnAutoGen.Location = new System.Drawing.Point(423, 207);
+            this.btnAutoGen.Name = "btnAutoGen";
+            this.btnAutoGen.Size = new System.Drawing.Size(195, 35);
+            this.btnAutoGen.TabIndex = 14;
+            this.btnAutoGen.Text = "Auto generate keys";
+            this.btnAutoGen.UseVisualStyleBackColor = true;
+            this.btnAutoGen.Click += new System.EventHandler(this.btnAutoGen_Click);
+            // 
+            // gBox2
+            // 
+            this.gBox2.Controls.Add(this.rbDecrypt);
+            this.gBox2.Controls.Add(this.rbEncrypt);
+            this.gBox2.Location = new System.Drawing.Point(286, 33);
+            this.gBox2.Name = "gBox2";
+            this.gBox2.Size = new System.Drawing.Size(207, 106);
+            this.gBox2.TabIndex = 15;
+            this.gBox2.TabStop = false;
+            this.gBox2.Text = "Operation";
+            // 
+            // rbDecrypt
+            // 
+            this.rbDecrypt.AutoSize = true;
+            this.rbDecrypt.Location = new System.Drawing.Point(17, 72);
+            this.rbDecrypt.Name = "rbDecrypt";
+            this.rbDecrypt.Size = new System.Drawing.Size(89, 24);
+            this.rbDecrypt.TabIndex = 1;
+            this.rbDecrypt.TabStop = true;
+            this.rbDecrypt.Text = "Decrypt";
+            this.rbDecrypt.UseVisualStyleBackColor = true;
+            // 
+            // rbEncrypt
+            // 
+            this.rbEncrypt.AutoSize = true;
+            this.rbEncrypt.Location = new System.Drawing.Point(17, 34);
+            this.rbEncrypt.Name = "rbEncrypt";
+            this.rbEncrypt.Size = new System.Drawing.Size(88, 24);
+            this.rbEncrypt.TabIndex = 0;
+            this.rbEncrypt.TabStop = true;
+            this.rbEncrypt.Text = "Encrypt";
+            this.rbEncrypt.UseVisualStyleBackColor = true;
+            // 
+            // btnBrowseOutputFile
+            // 
+            this.btnBrowseOutputFile.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnBrowseOutputFile.Location = new System.Drawing.Point(657, 351);
+            this.btnBrowseOutputFile.Name = "btnBrowseOutputFile";
+            this.btnBrowseOutputFile.Size = new System.Drawing.Size(145, 36);
+            this.btnBrowseOutputFile.TabIndex = 16;
+            this.btnBrowseOutputFile.Text = "Browse";
+            this.btnBrowseOutputFile.UseVisualStyleBackColor = true;
+            this.btnBrowseOutputFile.Click += new System.EventHandler(this.btnBrowseOutputFile_Click);
             // 
             // Form2
             // 
@@ -206,10 +255,12 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.LightSteelBlue;
             this.ClientSize = new System.Drawing.Size(878, 483);
-            this.Controls.Add(this.btnAutoGenDT);
+            this.Controls.Add(this.btnBrowseOutputFile);
+            this.Controls.Add(this.gBox2);
+            this.Controls.Add(this.btnAutoGen);
             this.Controls.Add(this.tbInputFile);
             this.Controls.Add(this.lbl5);
-            this.Controls.Add(this.btnBrowse);
+            this.Controls.Add(this.btnBrowseInputFile);
             this.Controls.Add(this.btnDecrypt);
             this.Controls.Add(this.btnCrypt);
             this.Controls.Add(this.gBox1);
@@ -225,6 +276,8 @@
             this.Load += new System.EventHandler(this.Form2_Load);
             this.gBox1.ResumeLayout(false);
             this.gBox1.PerformLayout();
+            this.gBox2.ResumeLayout(false);
+            this.gBox2.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -241,11 +294,15 @@
         private System.Windows.Forms.GroupBox gBox1;
         private System.Windows.Forms.Button btnCrypt;
         private System.Windows.Forms.Button btnDecrypt;
-        private System.Windows.Forms.Button btnBrowse;
+        private System.Windows.Forms.Button btnBrowseInputFile;
         private System.Windows.Forms.RadioButton rbA52;
         private System.Windows.Forms.RadioButton rbDT;
         private System.Windows.Forms.Label lbl5;
         private System.Windows.Forms.TextBox tbInputFile;
-        private System.Windows.Forms.Button btnAutoGenDT;
+        private System.Windows.Forms.Button btnAutoGen;
+        private System.Windows.Forms.GroupBox gBox2;
+        private System.Windows.Forms.RadioButton rbDecrypt;
+        private System.Windows.Forms.RadioButton rbEncrypt;
+        private System.Windows.Forms.Button btnBrowseOutputFile;
     }
 }

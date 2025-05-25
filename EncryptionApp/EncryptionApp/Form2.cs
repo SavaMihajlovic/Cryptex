@@ -25,114 +25,155 @@ namespace EncryptionApp
             this.Load += new EventHandler(Form2_Load);
             rbDT.CheckedChanged += AlgorithmChanged;
             rbA52.CheckedChanged += AlgorithmChanged;
-
-            //Input_File_txt.Text = "Input_Plain.txt";
-            tbInputFile.Text = "C:\\Users\\msava\\OneDrive\\Desktop\\input.txt";
-            //Output_File_txt.Text = "Output_Encrypted.txt";
-            tbOutputFile.Text = "C:\\Users\\msava\\OneDrive\\Desktop\\output.txt";
+            rbEncrypt.CheckedChanged += OperationChanged;
+            rbDecrypt.CheckedChanged += OperationChanged;
         }
+
 
         private void AlgorithmChanged(object sender, EventArgs e)
         {
             if (rbDT.Checked)
             {
                 rbA52.Checked = false;
-
+                tb1.Text = "";
+                tb2.Text = "";
                 lbl1.Visible = true;
                 tb1.Visible = true;
                 lbl2.Visible = true;
                 tb2.Visible = true;
-                lbl4.Visible = true;
-                tbOutputFile.Visible = true;
-
                 lbl1.Text = "ColumnsKey:";
                 lbl2.Text = "RowsKey:";
             }
             else if (rbA52.Checked)
             {
                 rbDT.Checked = false;
-
+                tb1.Text = "";
+                tb2.Text = "";
+                lbl2.Text = "Key:";
+                lbl1.Text = "Frame: ";
+            }
+        }
+        private void OperationChanged(object sender, EventArgs e)
+        {
+            if (rbEncrypt.Checked)
+            {
+                tbInputFile.Text = "";
+                tbOutputFile.Text = "";
                 lbl4.Visible = false;
                 tbOutputFile.Visible = false;
-
-                lbl1.Text = "Key:";
-                lbl2.Text = "Data: ";
+                btnDecrypt.Enabled = false;
+                btnCrypt.Enabled = true;
+                btnBrowseOutputFile.Visible = false;
+            }
+            else if (rbDecrypt.Checked)
+            {
+                tbInputFile.Text = "";
+                tbOutputFile.Text = "";
+                lbl4.Visible = true;
+                tbOutputFile.Visible = true;
+                btnDecrypt.Enabled = true;
+                btnCrypt.Enabled = false;
+                btnBrowseOutputFile.Visible = true;
             }
         }
         private void btnCrypt_Click(object sender, EventArgs e)
         {
             try
             {
-                if ((rbDT.Checked || rbA52.Checked)
-                    && tb1.Text != null
-                    && tb2.Text != null)
+                if (rbDT.Checked)
                 {
+                    if (string.IsNullOrWhiteSpace(tb1.Text) || string.IsNullOrWhiteSpace(tb2.Text))
+                    {
+                        MessageBox.Show("Molimo unesite oba ključa za Double Transposition algoritam.");
+                        return;
+                    }
+
                     string key1 = tb1.Text;
                     string key2 = tb2.Text;
                     string inputFile = tbInputFile.Text;
-                    string outputFile = tbOutputFile.Text;
+
+                    string outputDirectory = @"C:\Users\msava\OneDrive\Desktop\IV GODINA\SEMESTAR 7\ZASTITA INFORMACIJA\Cryptex\EncryptionApp\EncryptionApp\X";
+                    string inputFileName = Path.GetFileName(inputFile);
+                    string encryptedFileName = "encrypted_" + inputFileName;
+                    string outputFile = Path.Combine(outputDirectory, encryptedFileName);
+
                     DoubleTranspositionFileEncryptor.EncryptFile(inputFile, outputFile, key1, key2);
+                }
+                else if (rbA52.Checked)
+                {
+                    if (string.IsNullOrWhiteSpace(tb1.Text) || string.IsNullOrWhiteSpace(tb2.Text))
+                    {
+                        MessageBox.Show("Molimo unesite oba ključa za A52 algoritam.");
+                        return;
+                    }
+
+                    string privateKey = tb1.Text;
+                    string publicKey = tb2.Text;
+                    string inputFile = tbInputFile.Text;
+
+                    string outputDirectory = @"C:\Users\msava\OneDrive\Desktop\IV GODINA\SEMESTAR 7\ZASTITA INFORMACIJA\Cryptex\EncryptionApp\EncryptionApp\X";
+                    string inputFileName = Path.GetFileName(inputFile);
+                    string encryptedFileName = "encrypted_" + inputFileName;
+                    string outputFile = Path.Combine(outputDirectory, encryptedFileName);
+
+                    A52FileEncryptor.EncryptFile(inputFile, outputFile, privateKey, publicKey);
                 }
             }
             catch (Exception ex)
             {
-                Console.Error.WriteLine("Niste uneli oba kljuca " + ex.Message);
+                MessageBox.Show("Došlo je do greške prilikom enkripcije: " + ex.Message);
             }
         }
 
         private void btnDecrypt_Click(object sender, EventArgs e)
         {
-            if (rbDT.Checked)
+            try
             {
-                string key1 = tb1.Text;
-                string key2 = tb2.Text;
-                string inputFile = tbInputFile.Text;
-                string outputFile = tbOutputFile.Text;
-                DoubleTranspositionFileEncryptor.DecryptFile(inputFile, outputFile, key1, key2);
-            }
-        }
-
-        private void btnBrowse_Click(object sender, EventArgs e)
-        {
-            using (OpenFileDialog openFileDialog = new OpenFileDialog())
-            {
-                openFileDialog.InitialDirectory = "C:\\";
-                openFileDialog.Filter = "All files (*.*)|*.*";
-                openFileDialog.FilterIndex = 1;
-                openFileDialog.RestoreDirectory = true;
-
-                if (openFileDialog.ShowDialog() == DialogResult.OK)
+                if (rbDT.Checked)
                 {
-
-                    string filePath = openFileDialog.FileName;
-
-                    string targetDirectory = @"C:\Users\msava\OneDrive\Desktop\IV GODINA\SEMESTAR 7\ZASTITA INFORMACIJA\Cryptex\EncryptionApp\EncryptionApp\Target"; 
-
-                    if (!Directory.Exists(targetDirectory))
+                    if (string.IsNullOrWhiteSpace(tb1.Text) || string.IsNullOrWhiteSpace(tb2.Text))
                     {
-                        Directory.CreateDirectory(targetDirectory);
+                        MessageBox.Show("Molimo unesite oba ključa za Double Transposition algoritam.");
+                        return;
                     }
 
-                    string targetFilePath = Path.Combine(targetDirectory, Path.GetFileName(filePath));
+                    string key1 = tb1.Text;
+                    string key2 = tb2.Text;
+                    string inputFile = tbInputFile.Text;
+                    string outputFile = tbOutputFile.Text;
 
-                    try
-                    {
-                        File.Copy(filePath, targetFilePath);
-                        MessageBox.Show($"Fajl je uspešno učitan u:\n {targetFilePath}");
-                        tbInputFile.Text = targetFilePath;
-                    }
-                    catch (Exception ex)
-                    {
-                        MessageBox.Show($"Došlo je do greške pri kopiranju fajla: {ex.Message}");
-                    }
+                    DoubleTranspositionFileEncryptor.DecryptFile(inputFile, outputFile, key1, key2);
                 }
+                else if (rbA52.Checked)
+                {
+                    if (string.IsNullOrWhiteSpace(tb1.Text) || string.IsNullOrWhiteSpace(tb2.Text))
+                    {
+                        MessageBox.Show("Molimo unesite oba ključa za A52 algoritam.");
+                        return;
+                    }
+
+                    string privateKey = tb1.Text;
+                    string publicKey = tb2.Text;
+                    string inputFile = tbInputFile.Text;
+                    string outputFile = tbOutputFile.Text;
+
+                    A52FileEncryptor.DecryptFile(inputFile, outputFile, privateKey, publicKey);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Došlo je do greške prilikom dekripcije: " + ex.Message);
             }
         }
 
         private void Form2_Load(object sender, EventArgs e)
         {
             rbDT.Checked = true;
+            rbEncrypt.Checked = true;
+            //tb1.UseSystemPasswordChar = true;
+            //tb2.UseSystemPasswordChar = true;
             AlgorithmChanged(null, null);
+            OperationChanged(null, null);
             InitFSW();
         }
 
@@ -160,7 +201,7 @@ namespace EncryptionApp
             Application.Exit();
         }
 
-        private void AutoGenKeys(string filePath)
+        private void AutoGenDTKeys(string filePath)
         {
             try
             {
@@ -172,7 +213,7 @@ namespace EncryptionApp
 
                 Random rand = new Random();
                 string key1 = new string(Enumerable.Range(0, keyColumns)
-                                                   .Select(_ => (char)rand.Next(49, 57)) 
+                                                   .Select(_ => (char)rand.Next(49, 57))
                                                    .ToArray());
                 string key2 = new string(Enumerable.Range(0, keyRows)
                                                    .Select(_ => (char)rand.Next(49, 57))
@@ -187,9 +228,106 @@ namespace EncryptionApp
             }
         }
 
-        private void btnAutoGenDT_Click(object sender, EventArgs e)
+        private void AutoGenA52Keys()
         {
-            AutoGenKeys(tbInputFile.Text);
+            try
+            {
+                Random rnd = new Random();
+                byte[] privateKey = new byte[8];
+                rnd.NextBytes(privateKey);
+
+                int publicKey = rnd.Next(0, 4194304);
+
+                string formattedPrivateKey = string.Concat(privateKey.Select(b => b.ToString("X2")));
+                string formattedPublicKey = publicKey.ToString("X6");
+
+                tb1.Text = formattedPrivateKey;
+                tb2.Text = formattedPublicKey;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Došlo je do greške pri generisanju ključeva: {ex.Message}", "Greška", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void btnAutoGen_Click(object sender, EventArgs e)
+        {
+            if (rbDT.Checked)
+            {
+                AutoGenDTKeys(tbInputFile.Text);
+            }
+            else
+            {
+                AutoGenA52Keys();
+            }
+        }
+
+        private void btnBrowseInputFile_Click(object sender, EventArgs e)
+        {
+            using (OpenFileDialog openFileDialog = new OpenFileDialog())
+            {
+                if (rbDecrypt.Checked)
+                {
+                    openFileDialog.InitialDirectory = @"C:\Users\msava\OneDrive\Desktop\IV GODINA\SEMESTAR 7\ZASTITA INFORMACIJA\Cryptex\EncryptionApp\EncryptionApp\X";
+                }
+                else
+                {
+                    openFileDialog.InitialDirectory = "C:\\";
+                }
+
+                openFileDialog.Filter = "All files (*.*)|*.*";
+                openFileDialog.FilterIndex = 1;
+                openFileDialog.RestoreDirectory = true;
+
+                if (openFileDialog.ShowDialog() == DialogResult.OK)
+                {
+                    string filePath = openFileDialog.FileName;
+
+                    if (rbDecrypt.Checked)
+                    {
+                        tbInputFile.Text = filePath;
+                    }
+                    else
+                    {
+                        string targetDirectory = @"C:\Users\msava\OneDrive\Desktop\IV GODINA\SEMESTAR 7\ZASTITA INFORMACIJA\Cryptex\EncryptionApp\EncryptionApp\Target";
+
+                        if (!Directory.Exists(targetDirectory))
+                        {
+                            Directory.CreateDirectory(targetDirectory);
+                        }
+
+                        string targetFilePath = Path.Combine(targetDirectory, Path.GetFileName(filePath));
+
+                        try
+                        {
+                            File.Copy(filePath, targetFilePath, true);
+                            MessageBox.Show($"Fajl je uspešno učitan u:\n{targetFilePath}");
+                            tbInputFile.Text = targetFilePath;
+                        }
+                        catch (Exception ex)
+                        {
+                            MessageBox.Show($"Došlo je do greške pri kopiranju fajla: {ex.Message}");
+                            tbInputFile.Text = filePath;
+                        }
+                    }
+                }
+            }
+        }
+
+        private void btnBrowseOutputFile_Click(object sender, EventArgs e)
+        {
+            using (SaveFileDialog saveFileDialog = new SaveFileDialog())
+            {
+                saveFileDialog.InitialDirectory = @"C:\";
+                saveFileDialog.Filter = "All files (*.*)|*.*";
+                saveFileDialog.FilterIndex = 1;
+                saveFileDialog.RestoreDirectory = true;
+
+                if (saveFileDialog.ShowDialog() == DialogResult.OK)
+                {
+                    tbOutputFile.Text = saveFileDialog.FileName;
+                }
+            }
         }
     }
 }
