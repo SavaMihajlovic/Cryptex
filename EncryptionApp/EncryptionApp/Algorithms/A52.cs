@@ -7,6 +7,8 @@ using System.ComponentModel;
 using System.Runtime.Remoting.Messaging;
 using word = System.UInt32;
 using System.Windows.Forms;
+using System.Security.Cryptography;
+using Microsoft.Win32;
 
 
 namespace EncryptionApp.Algorithms
@@ -16,6 +18,8 @@ namespace EncryptionApp.Algorithms
         private static A52 instance;
 
         private static word R1, R2, R3, R4;
+
+        private const int IVLength = 8;
 
         // Maske Shift registara R1-R4
 
@@ -169,11 +173,77 @@ namespace EncryptionApp.Algorithms
             }
             return output;
         }
-
-        // XOR je simetričan => isti kod za dekripciju
-        public static byte[] Decrypt(byte[] privateKey, word publicKey, byte[] data)
+        private static void ShiftRegisterLeftByOneByte(byte[] register, byte newByte)
         {
-            return Encrypt(privateKey, publicKey, data);
+            Buffer.BlockCopy(register, 1, register, 0, register.Length - 1);
+            register[register.Length - 1] = newByte;
+        }
+
+        public static byte[] EncryptCFB(byte[] privateKey, word publicKey, byte[] plaintext)
+        {
+            // 1. Generiši random IV
+            byte[] iv = new byte[IVLength];
+            using (var rng = RandomNumberGenerator.Create())
+            {
+                rng.GetBytes(iv);
+            }
+
+            // 2. Inicijalizuj shiftRegister sa IV
+            byte[] shiftRegister = new byte[IVLength];
+            Buffer.BlockCopy(iv, 0, shiftRegister, 0, IVLength);
+
+            byte[] ciphertext = new byte[IVLength + plaintext.Length];
+
+            // IV na početak ciphertexta
+            Buffer.BlockCopy(iv, 0, ciphertext, 0, IVLength);
+
+            // Sve do N - duzina plaintexta
+            for (int i = 0; i < plaintext.Length; i++)
+            {
+                // Dobij keystream bajt od shiftRegistera (koristeći A52)
+                byte[] encrypted = Encrypt(privateKey, publicKey, shiftRegister);
+                byte keystreamByte = encrypted[0]; // samo prvi bajt iz outputa
+
+                byte cipherByte = (byte)(plaintext[i] ^ keystreamByte);
+                ciphertext[IVLength + i] = cipherByte;
+
+                // Pomeri shiftRegister ulevo za 1 bajt i dodaj cipherByte na kraj
+                ShiftRegisterLeftByOneByte(shiftRegister, cipherByte);
+            }
+
+            return ciphertext;
+        }
+
+        public static byte[] DecryptCFB(byte[] privateKey, word publicKey, byte[] ciphertext)
+        {
+            if (ciphertext.Length < IVLength)
+                throw new ArgumentException("Ciphertext too short to contain IV");
+
+            // 1. Izvuci IV iz ciphertexta
+            byte[] iv = new byte[IVLength];
+            Buffer.BlockCopy(ciphertext, 0, iv, 0, IVLength);
+
+            byte[] shiftRegister = new byte[IVLength];
+            Buffer.BlockCopy(iv, 0, shiftRegister, 0, IVLength);
+
+            int plaintextLength = ciphertext.Length - IVLength;
+            byte[] plaintext = new byte[plaintextLength];
+
+            for (int i = 0; i < plaintextLength; i++)
+            {
+                // Dobij keystream bajt iz shiftRegistera
+                byte[] encrypted = Encrypt(privateKey, publicKey, shiftRegister);
+                byte keystreamByte = encrypted[0];
+
+                byte cipherByte = ciphertext[IVLength + i];
+                byte plainByte = (byte)(cipherByte ^ keystreamByte);
+                plaintext[i] = plainByte;
+
+                // Pomeri shiftRegister ulevo i dodaj ciphertext bajt na kraj
+                ShiftRegisterLeftByOneByte(shiftRegister, cipherByte);
+            }
+
+            return plaintext;
         }
     }
 }

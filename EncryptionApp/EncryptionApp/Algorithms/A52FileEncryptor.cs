@@ -19,7 +19,7 @@ namespace EncryptionApp.Algorithms
                     return;
 
                 byte[] inputData = File.ReadAllBytes(inputFile);
-                byte[] encryptedBytes = A52.Encrypt(privateKey, publicKey, inputData);
+                byte[] encryptedBytes = A52.EncryptCFB(privateKey, publicKey, inputData);
 
                 using (FileStream fs = new FileStream(outputFile, FileMode.Create, FileAccess.Write))
                 using (BinaryWriter writer = new BinaryWriter(fs))
@@ -49,7 +49,7 @@ namespace EncryptionApp.Algorithms
                 using (BinaryReader reader = new BinaryReader(fs))
                 {
                     byte[] fileBytes = reader.ReadBytes((int)fs.Length);
-                    byte[] decryptedBytes = A52.Decrypt(privateKey, publicKey, fileBytes);
+                    byte[] decryptedBytes = A52.DecryptCFB(privateKey, publicKey, fileBytes);
 
 
                     File.WriteAllBytes(outputFile, decryptedBytes);
