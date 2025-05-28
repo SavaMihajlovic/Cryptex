@@ -47,6 +47,7 @@
             this.rbDecrypt = new System.Windows.Forms.RadioButton();
             this.rbEncrypt = new System.Windows.Forms.RadioButton();
             this.btnBrowseOutputFile = new System.Windows.Forms.Button();
+            this.cBoxFSW = new System.Windows.Forms.CheckBox();
             this.gBox1.SuspendLayout();
             this.gBox2.SuspendLayout();
             this.SuspendLayout();
@@ -249,12 +250,23 @@
             this.btnBrowseOutputFile.UseVisualStyleBackColor = true;
             this.btnBrowseOutputFile.Click += new System.EventHandler(this.btnBrowseOutputFile_Click);
             // 
+            // cBoxFSW
+            // 
+            this.cBoxFSW.AutoSize = true;
+            this.cBoxFSW.Location = new System.Drawing.Point(547, 68);
+            this.cBoxFSW.Name = "cBoxFSW";
+            this.cBoxFSW.Size = new System.Drawing.Size(71, 24);
+            this.cBoxFSW.TabIndex = 17;
+            this.cBoxFSW.Text = "FSW";
+            this.cBoxFSW.UseVisualStyleBackColor = true;
+            // 
             // Form2
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.LightSteelBlue;
             this.ClientSize = new System.Drawing.Size(878, 483);
+            this.Controls.Add(this.cBoxFSW);
             this.Controls.Add(this.btnBrowseOutputFile);
             this.Controls.Add(this.gBox2);
             this.Controls.Add(this.btnAutoGen);
@@ -304,5 +316,6 @@
         private System.Windows.Forms.RadioButton rbDecrypt;
         private System.Windows.Forms.RadioButton rbEncrypt;
         private System.Windows.Forms.Button btnBrowseOutputFile;
+        private System.Windows.Forms.CheckBox cBoxFSW;
     }
 }

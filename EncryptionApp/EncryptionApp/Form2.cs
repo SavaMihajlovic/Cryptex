@@ -15,10 +15,13 @@ namespace EncryptionApp
 {
     public partial class Form2 : Form
     {
+
+        private FileSystemWatcher watcher;
         public Form2()
         {
             InitializeComponent();
             this.Text = "Cryptex - Algorithms";
+            this.Size = new Size(750, 500);
 
             btnCrypt.Click += btnCrypt_Click;
             btnDecrypt.Click += btnDecrypt_Click;
@@ -27,6 +30,7 @@ namespace EncryptionApp
             rbA52.CheckedChanged += AlgorithmChanged;
             rbEncrypt.CheckedChanged += OperationChanged;
             rbDecrypt.CheckedChanged += OperationChanged;
+            cBoxFSW.CheckedChanged += cBoxFSW_CheckedChanged;
         }
 
 
@@ -170,8 +174,6 @@ namespace EncryptionApp
         {
             rbDT.Checked = true;
             rbEncrypt.Checked = true;
-            //tb1.UseSystemPasswordChar = true;
-            //tb2.UseSystemPasswordChar = true;
             AlgorithmChanged(null, null);
             OperationChanged(null, null);
             InitFSW();
@@ -179,16 +181,12 @@ namespace EncryptionApp
 
         private void InitFSW()
         {
-            using (var watcher = new FileSystemWatcher(@"C:\Users\msava\OneDrive\Desktop\IV GODINA\SEMESTAR 7\ZASTITA INFORMACIJA\Cryptex\EncryptionApp\EncryptionApp\Target"))
-            {
-                watcher.NotifyFilter = NotifyFilters.FileName | NotifyFilters.DirectoryName;
-                watcher.Filter = "*.*";
-                watcher.Created += FileSystemWatcher_Created;
-                watcher.IncludeSubdirectories = true;
-                watcher.EnableRaisingEvents = true;
-
-                Application.DoEvents();
-            }
+            watcher = new FileSystemWatcher(@"C:\Users\msava\OneDrive\Desktop\IV GODINA\SEMESTAR 7\ZASTITA INFORMACIJA\Cryptex\EncryptionApp\EncryptionApp\Target");
+            watcher.NotifyFilter = NotifyFilters.FileName | NotifyFilters.DirectoryName;
+            watcher.Filter = "*.*";
+            watcher.Created += FileSystemWatcher_Created;
+            watcher.IncludeSubdirectories = true;
+            watcher.EnableRaisingEvents = cBoxFSW.Checked;
         }
 
         private void FileSystemWatcher_Created(object sender, FileSystemEventArgs e)
@@ -289,24 +287,31 @@ namespace EncryptionApp
                     }
                     else
                     {
-                        string targetDirectory = @"C:\Users\msava\OneDrive\Desktop\IV GODINA\SEMESTAR 7\ZASTITA INFORMACIJA\Cryptex\EncryptionApp\EncryptionApp\Target";
-
-                        if (!Directory.Exists(targetDirectory))
+                        if (cBoxFSW.Checked)
                         {
-                            Directory.CreateDirectory(targetDirectory);
+                            string targetDirectory = @"C:\Users\msava\OneDrive\Desktop\IV GODINA\SEMESTAR 7\ZASTITA INFORMACIJA\Cryptex\EncryptionApp\EncryptionApp\Target";
+
+                            if (!Directory.Exists(targetDirectory))
+                            {
+                                Directory.CreateDirectory(targetDirectory);
+                            }
+
+                            string targetFilePath = Path.Combine(targetDirectory, Path.GetFileName(filePath));
+
+                            try
+                            {
+                                File.Copy(filePath, targetFilePath, true);
+                                tbInputFile.Text = targetFilePath;
+                            }
+                            catch (Exception ex)
+                            {
+                                MessageBox.Show($"Došlo je do greške pri kopiranju fajla: {ex.Message}");
+                                tbInputFile.Text = filePath;
+                            }
                         }
-
-                        string targetFilePath = Path.Combine(targetDirectory, Path.GetFileName(filePath));
-
-                        try
+                        else
                         {
-                            File.Copy(filePath, targetFilePath, true);
-                            MessageBox.Show($"Fajl je uspešno učitan u:\n{targetFilePath}");
-                            tbInputFile.Text = targetFilePath;
-                        }
-                        catch (Exception ex)
-                        {
-                            MessageBox.Show($"Došlo je do greške pri kopiranju fajla: {ex.Message}");
+
                             tbInputFile.Text = filePath;
                         }
                     }
@@ -327,6 +332,16 @@ namespace EncryptionApp
                 {
                     tbOutputFile.Text = saveFileDialog.FileName;
                 }
+            }
+        }
+
+        private void cBoxFSW_CheckedChanged(object sender, EventArgs e)
+        {
+            if (watcher != null)
+            {
+                watcher.EnableRaisingEvents = cBoxFSW.Checked;
+                string status = cBoxFSW.Checked ? "uključen" : "isključen";
+                MessageBox.Show($"FileSystemWatcher je {status}.");
             }
         }
     }
