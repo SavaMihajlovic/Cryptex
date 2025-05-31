@@ -17,7 +17,7 @@ namespace EncryptionApp
         {
             InitializeComponent();
             this.Text = "Cryptex";
-            this.BackgroundImage = Image.FromFile(@"C:\Users\msava\OneDrive\Desktop\IV GODINA\SEMESTAR 7\ZASTITA INFORMACIJA\Cryptex\EncryptionApp\EncryptionApp\Images\encryption.jpg");
+            this.BackgroundImage = Image.FromFile(@"C:\Users\msava\OneDrive\Desktop\IV GODINA\SEMESTAR 7\ZASTITA INFORMACIJA\Cryptex\EncryptionApp\EncryptionApp\Assets\encryption.jpg");
             this.BackgroundImageLayout = ImageLayout.Stretch;
         }
         private void Form1_Load(object sender, EventArgs e)
