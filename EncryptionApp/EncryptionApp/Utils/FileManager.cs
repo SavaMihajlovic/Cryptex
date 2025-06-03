@@ -10,6 +10,8 @@ namespace EncryptionApp.Utils
 {
     public class FileManager
     {
+        private static readonly string outputDirectory = @"C:\Users\msava\OneDrive\Desktop\IV GODINA\SEMESTAR 7\ZASTITA INFORMACIJA\Cryptex\EncryptionApp\EncryptionApp\X";
+
         private FileSystemWatcher watcher;
         public void InitFSW(bool isFSWChecked)
         {
@@ -84,6 +86,13 @@ namespace EncryptionApp.Utils
                 }
             }
             return null;
+        }
+        public string GetEncryptedOutputFilePath(string inputFilePath)
+        {
+            string inputFileName = Path.GetFileName(inputFilePath);
+            string encryptedFileName = "encrypted_" + inputFileName;
+            string outputFile = Path.Combine(outputDirectory, encryptedFileName);
+            return outputFile;
         }
     }
 }

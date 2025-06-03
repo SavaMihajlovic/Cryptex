@@ -10,7 +10,7 @@ namespace EncryptionApp.Utils
 {
     public class KeyGenerator
     {
-        public (string key1, string key2) AutoGenDTKeys(string filePath)
+        public static (string key1, string key2) AutoGenDTKeys(string filePath)
         {
             byte[] fileBytes = File.ReadAllBytes(filePath);
             int byteCount = fileBytes.Length;
@@ -28,7 +28,7 @@ namespace EncryptionApp.Utils
 
             return (key1, key2);
         }
-        public (string privateKeyHex, string publicKeyHex) AutoGenA52Keys()
+        public static (string privateKeyHex, string publicKeyHex) AutoGenA52Keys()
         {
             Random rnd = new Random();
             byte[] privateKey = new byte[8];

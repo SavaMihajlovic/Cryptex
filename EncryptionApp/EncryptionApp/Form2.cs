@@ -1,4 +1,6 @@
 ﻿using EncryptionApp.Algorithms;
+using EncryptionApp.Encryption.Services;
+using EncryptionApp.FileTransfer;
 using EncryptionApp.Utils;
 using System;
 using System.Collections.Generic;
@@ -17,13 +19,20 @@ namespace EncryptionApp
     public partial class Form2 : Form
     {
         private FileManager fileManager;
-        private KeyGenerator keyGenerator;
+        private FileSender fileSender;
+        private FileReceiver fileReceiver;
 
         public Form2()
-        {
+        { 
             InitializeComponent();
             this.Text = "Cryptex - Algorithms";
             this.Size = new Size(700, 500);
+
+            fileManager = new FileManager();
+            fileSender = new FileSender();
+            fileReceiver = new FileReceiver();
+            fileSender.StatusUpdateAsync = async (msg) => await UpdateStatusAsync(tssLabelSend, msg);
+            fileReceiver.StatusUpdateAsync = async (msg) => await UpdateStatusAsync(tssLabelReceive, msg);
 
             btnCrypt.Click += btnCrypt_Click;
             btnDecrypt.Click += btnDecrypt_Click;
@@ -34,10 +43,10 @@ namespace EncryptionApp
             rbDecrypt.CheckedChanged += OperationChanged;
             cBoxFSW.CheckedChanged += cBoxFSW_CheckedChanged;
         }
+
+        #region Main
         private void Form2_Load(object sender, EventArgs e)
         {
-            fileManager = new FileManager();
-            keyGenerator = new KeyGenerator();
             rbDT.Checked = true;
             rbEncrypt.Checked = true;
             cBoxFSW.Checked = false;
@@ -117,13 +126,13 @@ namespace EncryptionApp
                         return;
                     }
 
-                    var (key1, key2) = keyGenerator.AutoGenDTKeys(tbInputFile.Text);
+                    var (key1, key2) = KeyGenerator.AutoGenDTKeys(tbInputFile.Text);
                     tb1.Text = key1;
                     tb2.Text = key2;
                 }
                 else
                 {
-                    var (key1, key2) = keyGenerator.AutoGenA52Keys();
+                    var (key1, key2) = KeyGenerator.AutoGenA52Keys();
                     tb1.Text = key1;
                     tb2.Text = key2;
                 }
@@ -171,13 +180,9 @@ namespace EncryptionApp
                     string key1 = tb1.Text;
                     string key2 = tb2.Text;
                     string inputFile = tbInputFile.Text;
+                    string outputFile = fileManager.GetEncryptedOutputFilePath(inputFile);
 
-                    string outputDirectory = @"C:\Users\msava\OneDrive\Desktop\IV GODINA\SEMESTAR 7\ZASTITA INFORMACIJA\Cryptex\EncryptionApp\EncryptionApp\X";
-                    string inputFileName = Path.GetFileName(inputFile);
-                    string encryptedFileName = "encrypted_" + inputFileName;
-                    string outputFile = Path.Combine(outputDirectory, encryptedFileName);
-
-                    DoubleTranspositionFileEncryptor.EncryptFile(inputFile, outputFile, key1, key2);
+                    EncryptionService.EncryptDT(inputFile, outputFile, key1, key2);
                 }
                 else if (rbA52.Checked)
                 {
@@ -190,13 +195,9 @@ namespace EncryptionApp
                     string privateKey = tb1.Text;
                     string publicKey = tb2.Text;
                     string inputFile = tbInputFile.Text;
+                    string outputFile = fileManager.GetEncryptedOutputFilePath(inputFile);
 
-                    string outputDirectory = @"C:\Users\msava\OneDrive\Desktop\IV GODINA\SEMESTAR 7\ZASTITA INFORMACIJA\Cryptex\EncryptionApp\EncryptionApp\X";
-                    string inputFileName = Path.GetFileName(inputFile);
-                    string encryptedFileName = "encrypted_" + inputFileName;
-                    string outputFile = Path.Combine(outputDirectory, encryptedFileName);
-
-                    A52FileEncryptor.EncryptFile(inputFile, outputFile, privateKey, publicKey);
+                    EncryptionService.EncryptA52(inputFile, outputFile, privateKey, publicKey);
                 }
             }
             catch (Exception ex)
@@ -221,7 +222,7 @@ namespace EncryptionApp
                     string inputFile = tbInputFile.Text;
                     string outputFile = tbOutputFile.Text;
 
-                    DoubleTranspositionFileEncryptor.DecryptFile(inputFile, outputFile, key1, key2);
+                    EncryptionService.DecryptDT(inputFile, outputFile, key1, key2);
                 }
                 else if (rbA52.Checked)
                 {
@@ -236,7 +237,7 @@ namespace EncryptionApp
                     string inputFile = tbInputFile.Text;
                     string outputFile = tbOutputFile.Text;
 
-                    A52FileEncryptor.DecryptFile(inputFile, outputFile, privateKey, publicKey);
+                    EncryptionService.DecryptA52(inputFile, outputFile, privateKey, publicKey);
                 }
             }
             catch (Exception ex)
@@ -244,6 +245,10 @@ namespace EncryptionApp
                 MessageBox.Show("Došlo je do greške prilikom dekripcije: " + ex.Message);
             }
         }
+
+        #endregion
+
+        #region Sender
         private void btnBrowseSendFile_Click(object sender, EventArgs e)
         {
             string filePath = fileManager.BrowseFile(rbDecrypt.Checked, false);
@@ -251,6 +256,82 @@ namespace EncryptionApp
             {
                 tbFileToSend.Text = filePath;
             }
+        }
+        private async void btnSendFile_Click(object sender, EventArgs e)
+        {
+            string selectedAlgorithm = comboBox1.SelectedItem?.ToString(); // algoritam
+            string inputFile = tbFileToSend.Text; // ulazni fajl
+            string outputFile = fileManager.GetEncryptedOutputFilePath(inputFile); // izlazni fajl
+
+            if (string.IsNullOrEmpty(selectedAlgorithm) || string.IsNullOrEmpty(inputFile))
+            {
+                MessageBox.Show("Molimo Vas odaberite algoritam i fajl za kriptovanje.");
+                return;
+            }
+
+            // kriptovanje fajla
+            string key1, key2;
+            string encryptionAlgorithm;
+
+            if (selectedAlgorithm == "DoubleTransposition")
+            {
+                encryptionAlgorithm = "DoubleTransposition";
+                (key1, key2) = KeyGenerator.AutoGenDTKeys(inputFile);
+                EncryptionService.EncryptDT(inputFile, outputFile, key1, key2);
+            }
+                
+            else if (selectedAlgorithm == "A52")
+            {
+                encryptionAlgorithm = "A52";
+                (key1, key2) = KeyGenerator.AutoGenA52Keys();
+                EncryptionService.EncryptA52(inputFile, outputFile, key1, key2);
+            }
+            else
+                throw new InvalidOperationException("Nepoznat algoritam.");
+
+            MessageBox.Show($"Fajl je uspešno kriptovan u {outputFile}.");
+
+            // generisanje hash-a
+            string md5Hash = FileHashGenerator.GenerateMD5Hash(outputFile);
+
+            // slanje fajla putem TCP protokola
+            await fileSender.SendFileAsync(tbIPAddress.Text, int.Parse(tbPortSender.Text), md5Hash, encryptionAlgorithm, key1, key2, outputFile);
+        }
+
+        #endregion
+
+        #region Receiver
+        private void btnStartListening_Click(object sender, EventArgs e)
+        {
+            int port = int.Parse(tbPortReceiver.Text);
+            _ = Task.Run(() => fileReceiver.StartAsync(port));
+        }
+        private void btnStopListening_Click(object sender, EventArgs e)
+        {
+            fileReceiver.Stop();
+        }
+
+        #endregion
+        private async Task UpdateStatusAsync(ToolStripStatusLabel statusLabel, string message)
+        {
+            if (InvokeRequired)
+            {
+                await InvokeAsync(() => statusLabel.Text = message);
+            }
+            else
+            {
+                statusLabel.Text = message;
+            }
+        }
+        private Task InvokeAsync(Action action)
+        {
+            var tcs = new TaskCompletionSource<bool>();
+            Invoke(new MethodInvoker(() =>
+            {
+                action();
+                tcs.SetResult(true);
+            }));
+            return tcs.Task;
         }
     }
 }
