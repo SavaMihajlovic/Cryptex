@@ -18,8 +18,6 @@ public class DoubleTranspositionFileEncryptor
         {
             writer.Write(encryptedBytes);
         }
-
-        MessageBox.Show($"File encrypted successfully: {outputFile}");
     }
 
     public static void DecryptFile(string inputFile, string outputFile, string columnsKey, string rowsKey)
@@ -39,7 +37,6 @@ public class DoubleTranspositionFileEncryptor
 
             File.WriteAllBytes(outputFile, decryptedBytes);
         }
-        MessageBox.Show($"File decrypted successfully: {outputFile}");
     }
     private static bool IsTextFile(string extension)
     {

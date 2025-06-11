@@ -13,10 +13,10 @@ namespace EncryptionApp.Algorithms
     {
         public static void EncryptFile(string inputFile, string outputFile, string privateKeyHex, string publicKeyHex)
         {
-            try
-            {
                 if (!TryParseKeys(privateKeyHex, publicKeyHex, out byte[] privateKey, out word publicKey))
-                    return;
+                {
+                    throw new ArgumentException("Invalid keys provided.");
+                }
 
                 byte[] inputData = File.ReadAllBytes(inputFile);
                 byte[] encryptedBytes = A52.EncryptCFB(privateKey, publicKey, inputData);
@@ -26,24 +26,14 @@ namespace EncryptionApp.Algorithms
                 {
                     writer.Write(encryptedBytes);
                 }
-                MessageBox.Show($"File encrypted successfully: {outputFile}");
-            }
-            catch (FormatException)
-            {
-                MessageBox.Show("Invalid hex format in private or public key.");
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Encryption failed: {ex.Message}");
-            }
         }
 
         public static void DecryptFile(string inputFile, string outputFile, string privateKeyHex, string publicKeyHex)
         {
-            try
-            {
                 if (!TryParseKeys(privateKeyHex, publicKeyHex, out byte[] privateKey, out word publicKey))
-                    return;
+                {
+                    throw new ArgumentException("Invalid keys provided.");
+                }
 
                 using (FileStream fs = new FileStream(inputFile, FileMode.Open, FileAccess.Read))
                 using (BinaryReader reader = new BinaryReader(fs))
@@ -51,19 +41,8 @@ namespace EncryptionApp.Algorithms
                     byte[] fileBytes = reader.ReadBytes((int)fs.Length);
                     byte[] decryptedBytes = A52.DecryptCFB(privateKey, publicKey, fileBytes);
 
-
                     File.WriteAllBytes(outputFile, decryptedBytes);
                 }
-                MessageBox.Show($"File decrypted successfully: {outputFile}");
-            }
-            catch (FormatException)
-            {
-                MessageBox.Show("Invalid hex format in private or public key.");
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Decryption failed: {ex.Message}");
-            }
         }
 
         private static bool TryParseKeys(string privateKeyHex, string publicKeyHex, out byte[] privateKey, out word publicKey)
@@ -73,13 +52,11 @@ namespace EncryptionApp.Algorithms
 
             if (privateKeyHex.Length != 16)
             {
-                MessageBox.Show("Private key must be exactly 16 hex characters (8 bytes).");
                 return false;
             }
 
             if (publicKeyHex.Length != 6)
             {
-                MessageBox.Show("Public key must be exactly 6 hex characters (3 bytes / 22 bits).");
                 return false;
             }
 
@@ -94,13 +71,11 @@ namespace EncryptionApp.Algorithms
                 publicKey = Convert.ToUInt32(publicKeyHex, 16);
                 if (publicKey > 0x3FFFFF) // 22-bit max value
                 {
-                    MessageBox.Show("Public key (frame) must be a 22-bit number (0 to 4,194,303).");
                     return false;
                 }
             }
             catch
             {
-                MessageBox.Show("Invalid hex format in private or public key.");
                 return false;
             }
 

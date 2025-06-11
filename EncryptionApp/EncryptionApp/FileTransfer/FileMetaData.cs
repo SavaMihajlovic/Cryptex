@@ -13,6 +13,10 @@ namespace EncryptionApp.FileTransfer
         public string Hash { get; set; }
         public string EncryptionAlgorithm { get; set; }
         public string Key1 { get; set; }
+        public string PKey1 { get; set; }
+        public string IV1 { get; set; }
         public string Key2 { get; set; }
+        public string PKey2 { get; set; }
+        public string IV2 { get; set; }
     }
 }

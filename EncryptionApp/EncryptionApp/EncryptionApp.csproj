@@ -104,7 +104,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="Utils\AES.cs" />
+    <Compile Include="Utils\AesEncyptionUtils.cs" />
     <Compile Include="Utils\FileHashGenerator.cs" />
     <Compile Include="Utils\FileManager.cs" />
     <Compile Include="Utils\KeyGenerator.cs" />
@@ -119,6 +119,7 @@
       <SubType>Designer</SubType>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <None Include="config.json" />
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>

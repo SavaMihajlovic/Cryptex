@@ -10,6 +10,7 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Reflection.Emit;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -165,7 +166,7 @@ namespace EncryptionApp
                 }
             }
         }
-        private void btnCrypt_Click(object sender, EventArgs e)
+        private async void btnCrypt_Click(object sender, EventArgs e)
         {
             try
             {
@@ -182,7 +183,12 @@ namespace EncryptionApp
                     string inputFile = tbInputFile.Text;
                     string outputFile = fileManager.GetEncryptedOutputFilePath(inputFile);
 
-                    EncryptionService.EncryptDT(inputFile, outputFile, key1, key2);
+                    await Task.Run(() =>
+                    {
+                        MessageBox.Show("Encryption started.");
+                        EncryptionService.EncryptDT(inputFile, outputFile, key1, key2);
+                        MessageBox.Show($"Fajl je uspešno enkriptovan: {outputFile}");
+                    });
                 }
                 else if (rbA52.Checked)
                 {
@@ -197,7 +203,12 @@ namespace EncryptionApp
                     string inputFile = tbInputFile.Text;
                     string outputFile = fileManager.GetEncryptedOutputFilePath(inputFile);
 
-                    EncryptionService.EncryptA52(inputFile, outputFile, privateKey, publicKey);
+                    await Task.Run(() =>
+                    {
+                        MessageBox.Show("Encryption started.");
+                        EncryptionService.EncryptA52(inputFile, outputFile, privateKey, publicKey);
+                        MessageBox.Show($"Fajl je uspešno enkriptovan: {outputFile}");
+                    });
                 }
             }
             catch (Exception ex)
@@ -205,7 +216,7 @@ namespace EncryptionApp
                 MessageBox.Show("Došlo je do greške prilikom enkripcije: " + ex.Message);
             }
         }
-        private void btnDecrypt_Click(object sender, EventArgs e)
+        private async void btnDecrypt_Click(object sender, EventArgs e)
         {
             try
             {
@@ -222,7 +233,12 @@ namespace EncryptionApp
                     string inputFile = tbInputFile.Text;
                     string outputFile = tbOutputFile.Text;
 
-                    EncryptionService.DecryptDT(inputFile, outputFile, key1, key2);
+                    await Task.Run(() =>
+                    {
+                        MessageBox.Show("Decryption started.");
+                        EncryptionService.DecryptDT(inputFile, outputFile, key1, key2);
+                        MessageBox.Show($"Fajl je uspešno dekriptovan: {outputFile}");
+                    });
                 }
                 else if (rbA52.Checked)
                 {
@@ -237,7 +253,12 @@ namespace EncryptionApp
                     string inputFile = tbInputFile.Text;
                     string outputFile = tbOutputFile.Text;
 
-                    EncryptionService.DecryptA52(inputFile, outputFile, privateKey, publicKey);
+                    await Task.Run(() =>
+                    {
+                        MessageBox.Show("Decryption started.");
+                        EncryptionService.DecryptA52(inputFile, outputFile, privateKey, publicKey);
+                        MessageBox.Show($"Fajl je uspešno dekriptovan: {outputFile}");
+                    });
                 }
             }
             catch (Exception ex)
@@ -273,29 +294,41 @@ namespace EncryptionApp
             string key1, key2;
             string encryptionAlgorithm;
 
+            await UpdateStatusAsync(tssLabelSend, "Encryption started. Please wait...");
+
             if (selectedAlgorithm == "DoubleTransposition")
             {
                 encryptionAlgorithm = "DoubleTransposition";
                 (key1, key2) = KeyGenerator.AutoGenDTKeys(inputFile);
-                EncryptionService.EncryptDT(inputFile, outputFile, key1, key2);
-            }
-                
+
+                await Task.Run(() =>
+                {
+                    EncryptionService.EncryptDT(inputFile, outputFile, key1, key2);
+                });
+            }     
             else if (selectedAlgorithm == "A52")
             {
                 encryptionAlgorithm = "A52";
                 (key1, key2) = KeyGenerator.AutoGenA52Keys();
-                EncryptionService.EncryptA52(inputFile, outputFile, key1, key2);
+
+                await Task.Run(() =>
+                {
+                    EncryptionService.EncryptA52(inputFile, outputFile, key1, key2);
+                });
             }
             else
                 throw new InvalidOperationException("Nepoznat algoritam.");
 
+            await UpdateStatusAsync(tssLabelSend, "Encryption finished!");
             MessageBox.Show($"Fajl je uspešno kriptovan u {outputFile}.");
 
             // generisanje hash-a
             string md5Hash = FileHashGenerator.GenerateMD5Hash(outputFile);
 
             // slanje fajla putem TCP protokola
+            await UpdateStatusAsync(tssLabelSend, "Slanje fajla...");
             await fileSender.SendFileAsync(tbIPAddress.Text, int.Parse(tbPortSender.Text), md5Hash, encryptionAlgorithm, key1, key2, outputFile);
+            await UpdateStatusAsync(tssLabelSend, "Fajl uspešno prenet.");
         }
 
         #endregion

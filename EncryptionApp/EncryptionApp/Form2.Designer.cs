@@ -354,16 +354,16 @@
             this.statusStripSend.ImageScalingSize = new System.Drawing.Size(24, 24);
             this.statusStripSend.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.tssLabelSend});
-            this.statusStripSend.Location = new System.Drawing.Point(3, 503);
+            this.statusStripSend.Location = new System.Drawing.Point(3, 497);
             this.statusStripSend.Name = "statusStripSend";
-            this.statusStripSend.Size = new System.Drawing.Size(864, 22);
+            this.statusStripSend.Size = new System.Drawing.Size(864, 28);
             this.statusStripSend.TabIndex = 26;
             this.statusStripSend.Text = "statusStrip1";
             // 
             // tssLabelSend
             // 
             this.tssLabelSend.Name = "tssLabelSend";
-            this.tssLabelSend.Size = new System.Drawing.Size(0, 15);
+            this.tssLabelSend.Size = new System.Drawing.Size(0, 21);
             // 
             // btnBrowseSendFile
             // 

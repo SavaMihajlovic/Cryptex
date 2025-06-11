@@ -4,6 +4,7 @@ using System;
 using System.IO;
 using System.Net;
 using System.Net.Sockets;
+using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -27,7 +28,7 @@ namespace EncryptionApp.FileTransfer
                 serverSocket.Listen(5);
                 isRunning = true;
 
-                await StatusUpdateAsync?.Invoke("Server je spreman i osluškuje konekcije");
+                await StatusUpdateAsync?.Invoke("Server je spreman i osluškuje konekcije...");
 
                 while (isRunning)
                 {
@@ -88,11 +89,52 @@ namespace EncryptionApp.FileTransfer
                     byte[] jsonBytes = new byte[jsonLength];
                     await ReadExactAsync(networkStream, jsonBytes, jsonLength);
                     string json = Encoding.UTF8.GetString(jsonBytes);
-
                    
                     var metadata = JsonSerializer.Deserialize<FileMetadata>(json);
 
-                    await StatusUpdateAsync?.Invoke($"Preuzimanje fajla: {metadata.FileName} ({metadata.FileSize} bytes)");
+                    string key1Base64 = metadata.Key1;
+                    string pKey1Base64 = metadata.PKey1;
+                    string iv1Base64 = metadata.IV1;
+
+                    string key2Base64 = metadata.Key2;
+                    string pKey2Base64 = metadata.PKey2;
+                    string iv2Base64 = metadata.IV2;
+
+                    byte[] key1EncryptedBytes = Convert.FromBase64String(key1Base64);
+                    byte[] pKey1Bytes = Convert.FromBase64String(pKey1Base64);
+                    byte[] iv1Bytes = Convert.FromBase64String(iv1Base64);
+
+                    byte[] key2EncryptedBytes = Convert.FromBase64String(key2Base64);
+                    byte[] pKey2Bytes = null;
+                    byte[] iv2Bytes = null;
+
+                    if (metadata.EncryptionAlgorithm == "DoubleTransposition")
+                    {
+                        pKey2Bytes = Convert.FromBase64String(pKey2Base64);
+                        iv2Bytes = Convert.FromBase64String(iv2Base64);
+                    }
+
+                    string key1, key2;
+
+                    // Dešifrovanje ključeva
+                    byte[] decryptedKey1 = AesEncryptionUtils.DecryptBytes_Aes(key1EncryptedBytes, pKey1Bytes, iv1Bytes);
+                    string decryptedKey1String = Encoding.UTF8.GetString(decryptedKey1);
+
+                    byte[] decryptedKey2 = null;
+                    if (metadata.EncryptionAlgorithm == "DoubleTransposition" && key2EncryptedBytes != null && pKey2Bytes != null && iv2Bytes != null)
+                    {
+                        key1 = Encoding.UTF8.GetString(decryptedKey1);
+                        decryptedKey2 = AesEncryptionUtils.DecryptBytes_Aes(key2EncryptedBytes, pKey2Bytes, iv2Bytes);
+                        string decryptedKey2String = Encoding.UTF8.GetString(decryptedKey1);
+                        key2 = Encoding.UTF8.GetString(decryptedKey2);
+                    }
+                    else
+                    {
+                        key1 = AesEncryptionUtils.BytesToHexString(decryptedKey1);
+                        key2 = AesEncryptionUtils.BytesToHexString(key2EncryptedBytes);
+                    }
+
+                    await StatusUpdateAsync?.Invoke($"Preuzimanje fajla: {metadata.FileName} ({metadata.FileSize} bytes)...");
 
                     // 2. preuzimamo enkriptovani fajl
 
@@ -130,11 +172,11 @@ namespace EncryptionApp.FileTransfer
                         switch (metadata.EncryptionAlgorithm)
                         {
                             case "DoubleTransposition":
-                                EncryptionService.DecryptDT(savePath, decryptedPath, metadata.Key1, metadata.Key2);
+                                EncryptionService.DecryptDT(savePath, decryptedPath, key1, key2);
                                 break;
 
                             case "A52":
-                                EncryptionService.DecryptA52(savePath, decryptedPath, metadata.Key1, metadata.Key2);
+                                EncryptionService.DecryptA52(savePath, decryptedPath, key1, key2);
                                 break;
 
                             default:
